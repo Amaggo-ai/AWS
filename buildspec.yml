@@ -3,30 +3,27 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto17
-      docker: 20
-    commands:
-      - echo "Installing Maven"
-      - mvn --version
-      - echo "Logging in to Amazon ECR"
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 
-183295437599.dkr.ecr.us-east-1.amazonaws.com
+      java: corretto11
   pre_build:
     commands:
-      - echo "Building JAR"
-      - mvn clean package -DskipTests
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 
+183295437599.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=183295437599.dkr.ecr.us-east-1.amazonaws.com/springboot-inventory
       - IMAGE_TAG=latest
-      - IMAGE_URI=183295437599.dkr.ecr.us-east-1.amazonaws.com/springboot-inventory:$IMAGE_TAG
   build:
     commands:
-      - echo "Building Docker image"
-      - docker build -t springboot-inventory .
-      - docker tag springboot-inventory:latest $IMAGE_URI
+      - echo Building the Spring Boot application...
+      - mvn clean package -DskipTests
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
   post_build:
     commands:
-      - echo "Pushing Docker image to ECR"
-      - docker push $IMAGE_URI
-      - printf '[{"name":"springboot-inventory","imageUri":"%s"}]' $IMAGE_URI > imagedefinitions.json
+      - echo Pushing Docker image to ECR...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - printf '[{"name":"springboot-inventory-app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+
 artifacts:
-  files: imagedefinitions.json
+  files:
+    - imagedefinitions.json
 
