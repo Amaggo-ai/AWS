@@ -11,9 +11,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_REGION | \
-        docker login --username AWS --password-stdin \
-        183295437599.dkr.ecr.$AWS_REGION.amazonaws.com
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin\ 183295437599.dkr.ecr.$AWS_REGION.amazonaws.com
       - REPOSITORY_URI=183295437599.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
       - echo Repository URI: $REPOSITORY_URI
 
@@ -25,8 +23,9 @@ phases:
 
   post_build:
     commands:
-      - echo Build phase completed successfully!
-      - echo "You can add docker tag and push commands here if needed"
+      - echo Pushing Docker image to ECR...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Build and push completed successfully!
 
 artifacts:
   files:
