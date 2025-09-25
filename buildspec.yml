@@ -1,35 +1,34 @@
----
+-----
 version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: springboot-inventory
-    IMAGE_TAG: latest
-    AWS_REGION: us-east-1
-    ACCOUNT_ID: 183295437599
+    IMAGE_REPO_NAME: "springboot-inventory"
+    IMAGE_TAG: "latest"
+    AWS_REGION: "us-east-1"
+    ACCOUNT_ID: "183295437599"
 
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - >
-        aws ecr get-login-password --region $AWS_REGION |
-        docker login --username AWS --password-stdin
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_REGION \
+        | docker login --username AWS --password-stdin \
         $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
-      - echo Repository URI is $REPOSITORY_URI
+      - echo "Repository URI is $REPOSITORY_URI"
+
   build:
     commands:
-      - echo Building Docker image...
-      - docker build -t $IMAGE_REPO_NAME .
-      - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
+      - echo "Building Docker image..."
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+
   post_build:
     commands:
-      - echo Pushing Docker image to ECR...
-      - docker push $REPOSITORY_URI:latest
-      - echo Build and push completed
+      - echo "Pushing Docker image to ECR..."
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Build completed successfully!"
 
 artifacts:
   files:
-    - '**/*'
-
+    - imagedefinitions.json
