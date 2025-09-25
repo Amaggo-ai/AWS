@@ -17,20 +17,18 @@ phases:
         $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       - REPOSITORY_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
       - echo "Repository URI is $REPOSITORY_URI"
-
   build:
     commands:
       - echo "Building Docker image..."
       - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
-
   post_build:
     commands:
       - echo "Pushing Docker image to ECR..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Generating imagedefinitions.json for ECS deployment..."
       - printf '[{"name":"springboot-inventory","imageUri":"%s"}]'
         $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - echo "Build completed successfully!"
-
 artifacts:
   files:
     - imagedefinitions.json
