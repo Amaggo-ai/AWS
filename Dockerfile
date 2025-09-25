@@ -1,15 +1,17 @@
-# Use Eclipse Temurin 17 JRE from AWS Public ECR (no DockerHub rate limit)
-FROM public.ecr.aws/docker/library/eclipse-temurin:17-jre
-
-# Set working directory
+# Stage 1: Build the JAR using Maven
+FROM maven:3.9.8-eclipse-temurin-17 AS builder
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy the built JAR
-COPY target/*.jar app.jar
+# Stage 2: Run the Spring Boot app
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
 
-# Expose port 8080 (Spring Boot default)
+# Expose Spring Boot default port
 EXPOSE 8080
 
-# Run the app
+# Run the JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
