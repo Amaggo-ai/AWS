@@ -1,5 +1,5 @@
-# Use Amazon Corretto 17 from AWS Public ECR
-FROM public.ecr.aws/corretto/amazoncorretto:17
+# Use Eclipse Temurin 17 JRE from AWS Public ECR (no DockerHub rate limit)
+FROM public.ecr.aws/docker/library/eclipse-temurin:17-jre
 
 # Set working directory
 WORKDIR /app
