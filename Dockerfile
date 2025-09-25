@@ -1,5 +1,5 @@
-# Use Amazon Corretto 17
-FROM public.ecr.aws/corretto/corretto:17
+# Use Amazon Corretto 17 from AWS Public ECR
+FROM public.ecr.aws/corretto/amazoncorretto:17
 
 # Set working directory
 WORKDIR /app
